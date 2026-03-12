@@ -4,287 +4,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>하루 할일 - Daily Task Tracker</title>
-    
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    
-    <!-- React & Babel CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- date-fns -->
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/dist/date-fns.min.js"></script>
-
     <style>
-        :root {
-            --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-            --font-serif: "Cormorant Garamond", serif;
-        }
-        body {
-            font-family: var(--font-sans);
-            background-color: #F5F5F0;
-            color: #1A1A1A;
-            margin: 0;
-        }
+        :root { --font-sans: "Inter", sans-serif; --font-serif: "Cormorant Garamond", serif; }
+        body { font-family: var(--font-sans); background-color: #F5F5F0; color: #1A1A1A; margin: 0; }
         .font-serif { font-family: var(--font-serif); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background: rgba(90, 90, 64, 0.2); 
-            border-radius: 10px; 
-        }
-        
-        /* Simple animations */
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(90, 90, 64, 0.2); border-radius: 10px; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .modal-bg { animation: modalBg 0.3s ease-out; }
-        @keyframes modalBg { from { opacity: 0; } to { opacity: 1; } }
-        
-        .modal-content { animation: modalContent 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes modalContent { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     </style>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Cormorant Garamond', 'serif'],
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body>
-    <div id="root">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-            <p>애플리케이션을 불러오는 중입니다...</p>
+    <div id="app" class="min-h-screen pb-20 px-6 py-12 fade-in">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <header class="flex items-center justify-between mb-12">
+                <div>
+                    <h1 class="text-4xl font-serif font-light tracking-tight">하루 <span class="italic text-[#5A5A40]">할일</span></h1>
+                    <p class="text-sm text-[#5A5A40]/60 mt-1 uppercase tracking-widest font-medium">월간 진행 현황</p>
+                </div>
+                <button onclick="openSettings()" class="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-all text-[#5A5A40]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Calendar Section -->
+                <div class="lg:col-span-7">
+                    <div class="bg-white rounded-[32px] p-8 shadow-sm border border-[#5A5A40]/5">
+                        <div class="flex items-center justify-between mb-8">
+                            <h2 id="calendar-title" class="text-2xl font-serif italic">2024년 3월</h2>
+                            <div class="flex gap-2">
+                                <button onclick="prevMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+                                <button onclick="nextMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] uppercase tracking-widest font-bold text-[#5A5A40]/40">
+                            <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Daily Tasks Section -->
+                <div class="lg:col-span-5">
+                    <div class="sticky top-8">
+                        <div class="mb-8">
+                            <span class="text-[10px] uppercase tracking-[0.2em] text-[#5A5A40]/50 font-bold">선택된 날짜</span>
+                            <h3 id="selected-date-text" class="text-3xl font-serif mt-1">3월 12일</h3>
+                        </div>
+                        <div id="task-list" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+    <!-- Settings Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6">
+        <div onclick="closeSettings()" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md bg-white rounded-[40px] p-10 shadow-2xl">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-serif">할일 관리</h2>
+                <button onclick="closeSettings()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <div class="relative mb-8 flex gap-2">
+                <input id="new-task-input" type="text" placeholder="새로운 할일 이름..." class="flex-1 bg-[#F5F5F0] border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-[#5A5A40]/20 outline-none">
+                <button onclick="addTask()" class="p-4 bg-[#5A5A40] text-white rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+            </div>
+            <div id="manage-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar"></div>
+            <button onclick="closeSettings()" class="w-full mt-8 py-4 bg-[#5A5A40] text-white rounded-2xl font-bold uppercase tracking-widest text-xs">완료</button>
+        </div>
+    </div>
 
-        // Icon Component using Lucide
-        const Icon = ({ name, size = 24, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [name]);
-            return <i data-lucide={name} style={{ width: size, height: size }} className={`inline-block ${className}`}></i>;
-        };
+    <script>
+        // --- 데이터 상태 ---
+        let tasks = JSON.parse(localStorage.getItem('tasks-v1')) || [{ id: 't1', text: '리뷰 관리 매일매일 하기' }];
+        let completions = JSON.parse(localStorage.getItem('completions-v1')) || {};
+        let currentMonth = new Date();
+        let selectedDate = new Date();
 
-        function App() {
-            const [habits, setHabits] = useState([]);
-            const [completions, setCompletions] = useState({});
-            const [currentMonth, setCurrentMonth] = useState(new Date());
-            const [selectedDate, setSelectedDate] = useState(new Date());
-            const [newHabitText, setNewHabitText] = useState('');
-            const [isLoaded, setIsLoaded] = useState(false);
-            const [showSettings, setShowSettings] = useState(false);
-
-            const { 
-                format, addMonths, subMonths, startOfMonth, endOfMonth, 
-                startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, 
-                isSameDay, isToday 
-            } = window.dateFns;
-
-            // Load data from LocalStorage
-            useEffect(() => {
-                const savedHabits = localStorage.getItem('daily-tasks-list');
-                const savedCompletions = localStorage.getItem('daily-tasks-completions');
-                
-                if (savedHabits) setHabits(JSON.parse(savedHabits));
-                else setHabits([{ id: 'h1', text: '리뷰 관리 매일매일 하기', createdAt: Date.now() }]);
-                
-                if (savedCompletions) setCompletions(JSON.parse(savedCompletions));
-                
-                setIsLoaded(true);
-                if (window.lucide) window.lucide.createIcons();
-            }, []);
-
-            // Save data to LocalStorage
-            useEffect(() => {
-                if (isLoaded) {
-                    localStorage.setItem('daily-tasks-list', JSON.stringify(habits));
-                    localStorage.setItem('daily-tasks-completions', JSON.stringify(completions));
-                }
-            }, [habits, completions, isLoaded]);
-
-            const addHabit = (e) => {
-                e.preventDefault();
-                if (!newHabitText.trim()) return;
-                const newHabit = {
-                    id: Math.random().toString(36).substring(2, 9),
-                    text: newHabitText.trim(),
-                    createdAt: Date.now(),
-                };
-                setHabits([...habits, newHabit]);
-                setNewHabitText('');
-            };
-
-            const deleteHabit = (id) => {
-                if (!confirm('이 할일을 삭제하시겠습니까?')) return;
-                setHabits(habits.filter(h => h.id !== id));
-                const newCompletions = { ...completions };
-                Object.keys(newCompletions).forEach(date => {
-                    newCompletions[date] = newCompletions[date].filter(habitId => habitId !== id);
-                });
-                setCompletions(newCompletions);
-            };
-
-            const toggleCompletion = (habitId) => {
-                const dateKey = format(selectedDate, 'yyyy-MM-dd');
-                const currentDayCompletions = completions[dateKey] || [];
-                let newDayCompletions = currentDayCompletions.includes(habitId)
-                    ? currentDayCompletions.filter(id => id !== habitId)
-                    : [...currentDayCompletions, habitId];
-                setCompletions({ ...completions, [dateKey]: newDayCompletions });
-            };
-
-            const days = useMemo(() => {
-                const start = startOfWeek(startOfMonth(currentMonth));
-                const end = endOfWeek(endOfMonth(currentMonth));
-                return eachDayOfInterval({ start, end });
-            }, [currentMonth]);
-
-            const getCompletionRate = (date) => {
-                if (habits.length === 0) return 0;
-                const dateKey = format(date, 'yyyy-MM-dd');
-                return (completions[dateKey] || []).length / habits.length;
-            };
-
-            const selectedDateKey = format(selectedDate, 'yyyy-MM-dd');
-            const selectedDayCompletions = completions[selectedDateKey] || [];
-
-            return (
-                <div className="min-h-screen pb-20 px-6 py-12 fade-in">
-                    <div className="max-w-4xl mx-auto">
-                        
-                        {/* Header */}
-                        <header className="flex items-center justify-between mb-12">
-                            <div>
-                                <h1 className="text-4xl font-serif font-light tracking-tight">
-                                    하루 <span className="italic text-[#5A5A40]">할일</span>
-                                </h1>
-                                <p className="text-sm text-[#5A5A40]/60 mt-1 uppercase tracking-widest font-medium">월간 진행 현황</p>
-                            </div>
-                            <button onClick={() => setShowSettings(true)} className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-all text-[#5A5A40]">
-                                <Icon name="settings" size={20} />
-                            </button>
-                        </header>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                            
-                            {/* Calendar Section */}
-                            <div className="lg:col-span-7">
-                                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-[#5A5A40]/5">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <h2 className="text-2xl font-serif italic">{format(currentMonth, 'yyyy년 M월')}</h2>
-                                        <div className="flex gap-2">
-                                            <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-[#F5F5F0] rounded-full"><Icon name="chevron-left" size={20} /></button>
-                                            <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-[#F5F5F0] rounded-full"><Icon name="chevron-right" size={20} /></button>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-7 gap-2 mb-2">
-                                        {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                            <div key={day} className="text-center text-[10px] uppercase tracking-widest font-bold text-[#5A5A40]/40 py-2">{day}</div>
-                                        ))}
-                                    </div>
-                                    <div className="grid grid-cols-7 gap-2">
-                                        {days.map(day => {
-                                            const rate = getCompletionRate(day);
-                                            const isSel = isSameDay(day, selectedDate);
-                                            const isCurrMonth = isSameMonth(day, currentMonth);
-                                            return (
-                                                <button key={day.toString()} onClick={() => setSelectedDate(day)} 
-                                                    className={`aspect-square rounded-xl flex flex-col items-center justify-center relative transition-all border-2 ${!isCurrMonth ? 'opacity-20' : ''} ${isSel ? 'border-[#5A5A40]' : 'border-transparent'}`}
-                                                    style={{ 
-                                                        backgroundColor: rate > 0 ? `rgba(90, 90, 64, ${0.1 + rate * 0.8})` : isCurrMonth ? '#F9F9F7' : 'transparent', 
-                                                        color: rate > 0.6 ? 'white' : '#1A1A1A' 
-                                                    }}>
-                                                    <span className={`text-sm font-medium ${isToday(day) && !rate ? 'text-[#5A5A40] underline underline-offset-4 decoration-2' : ''}`}>{format(day, 'd')}</span>
-                                                    {rate === 1 && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-400 rounded-full" />}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Daily Tasks Section */}
-                            <div className="lg:col-span-5">
-                                <div className="sticky top-8">
-                                    <div className="mb-8">
-                                        <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A5A40]/50 font-bold">선택된 날짜</span>
-                                        <h3 className="text-3xl font-serif mt-1">{format(selectedDate, 'M월 d일')}</h3>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {habits.length === 0 ? (
-                                            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-[#5A5A40]/20">
-                                                <p className="text-sm text-[#5A5A40]/40">등록된 할일이 없습니다.</p>
-                                                <button onClick={() => setShowSettings(true)} className="mt-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40] hover:underline">첫 할일 추가하기</button>
-                                            </div>
-                                        ) : (
-                                            habits.map(habit => {
-                                                const isDone = selectedDayCompletions.includes(habit.id);
-                                                return (
-                                                    <div key={habit.id} onClick={() => toggleCompletion(habit.id)} 
-                                                        className={`flex items-center gap-4 p-5 rounded-2xl cursor-pointer transition-all border ${isDone ? 'bg-[#5A5A40] text-white border-transparent' : 'bg-white border-[#5A5A40]/5 shadow-sm hover:border-[#5A5A40]/20'}`}>
-                                                        {isDone ? <Icon name="check-circle-2" size={24} /> : <Icon name="circle" size={24} className="text-[#5A5A40]/30" />}
-                                                        <span className={`flex-1 text-lg font-medium ${isDone ? 'opacity-80' : ''}`}>{habit.text}</span>
-                                                    </div>
-                                                );
-                                            })
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Settings Modal */}
-                        {showSettings && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center p-6 modal-bg">
-                                <div onClick={() => setShowSettings(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
-                                <div className="relative w-full max-w-md bg-white rounded-[40px] p-10 shadow-2xl modal-content">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <h2 className="text-2xl font-serif">할일 관리</h2>
-                                        <button onClick={() => setShowSettings(false)} className="p-2 hover:bg-[#F5F5F0] rounded-full"><Icon name="x" size={20} /></button>
-                                    </div>
-                                    <form onSubmit={addHabit} className="relative mb-8">
-                                        <input type="text" value={newHabitText} onChange={(e) => setNewHabitText(e.target.value)} placeholder="새로운 할일 이름..." className="w-full bg-[#F5F5F0] border-none rounded-2xl px-6 py-4 pr-14 focus:ring-2 focus:ring-[#5A5A40]/20 outline-none" />
-                                        <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#5A5A40] text-white rounded-xl"><Icon name="plus" size={20} /></button>
-                                    </form>
-                                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {habits.map(habit => (
-                                            <div key={habit.id} className="flex items-center justify-between p-4 bg-[#F5F5F0]/50 rounded-xl group">
-                                                <span className="font-medium">{habit.text}</span>
-                                                <button onClick={() => deleteHabit(habit.id)} className="text-red-400 hover:text-red-600"><Icon name="trash-2" size={18} /></button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <button onClick={() => setShowSettings(false)} className="w-full mt-8 py-4 bg-[#5A5A40] text-white rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-[#4A4A30] transition-colors">완료</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
+        // --- 초기화 및 저장 ---
+        function save() {
+            localStorage.setItem('tasks-v1', JSON.stringify(tasks));
+            localStorage.setItem('completions-v1', JSON.stringify(completions));
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function formatDate(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        // --- 기능 함수 ---
+        function prevMonth() { currentMonth.setMonth(currentMonth.getMonth() - 1); render(); }
+        function nextMonth() { currentMonth.setMonth(currentMonth.getMonth() + 1); render(); }
+        function openSettings() { document.getElementById('modal').classList.remove('hidden'); renderManageList(); }
+        function closeSettings() { document.getElementById('modal').classList.add('hidden'); render(); }
+
+        function addTask() {
+            const input = document.getElementById('new-task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            tasks.push({ id: 't' + Date.now(), text });
+            input.value = '';
+            save();
+            renderManageList();
+            render();
+        }
+
+        function deleteTask(id) {
+            if (!confirm('이 할일을 삭제하시겠습니까?')) return;
+            tasks = tasks.filter(t => t.id !== id);
+            save();
+            renderManageList();
+            render();
+        }
+
+        function toggleComplete(taskId) {
+            const key = formatDate(selectedDate);
+            if (!completions[key]) completions[key] = [];
+            const idx = completions[key].indexOf(taskId);
+            if (idx > -1) completions[key].splice(idx, 1);
+            else completions[key].push(taskId);
+            save();
+            render();
+        }
+
+        // --- 렌더링 함수 ---
+        function render() {
+            renderCalendar();
+            renderTaskList();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const title = document.getElementById('calendar-title');
+            grid.innerHTML = '';
+            
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            title.innerText = `${year}년 ${month + 1}월`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            // 빈 칸 (이전 달)
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="aspect-square"></div>`;
+            }
+
+            // 날짜 채우기
+            for (let i = 1; i <= lastDate; i++) {
+                const dateObj = new Date(year, month, i);
+                const key = formatDate(dateObj);
+                const doneCount = (completions[key] || []).length;
+                const rate = tasks.length > 0 ? doneCount / tasks.length : 0;
+                const isSelected = formatDate(selectedDate) === key;
+                const isToday = formatDate(new Date()) === key;
+
+                const btn = document.createElement('button');
+                btn.onclick = () => { selectedDate = new Date(year, month, i); render(); };
+                btn.className = `aspect-square rounded-xl flex flex-col items-center justify-center relative transition-all border-2 ${isSelected ? 'border-[#5A5A40]' : 'border-transparent'}`;
+                
+                if (rate > 0) {
+                    btn.style.backgroundColor = `rgba(90, 90, 64, ${0.1 + rate * 0.8})`;
+                    btn.style.color = rate > 0.6 ? 'white' : '#1A1A1A';
+                } else {
+                    btn.className += " bg-[#F9F9F7]";
+                }
+
+                btn.innerHTML = `<span class="text-sm font-medium ${isToday && rate === 0 ? 'text-[#5A5A40] underline underline-offset-4 decoration-2' : ''}">${i}</span>`;
+                if (rate === 1 && tasks.length > 0) {
+                    btn.innerHTML += `<div class="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>`;
+                }
+                grid.appendChild(btn);
+            }
+        }
+
+        function renderTaskList() {
+            const list = document.getElementById('task-list');
+            const dateText = document.getElementById('selected-date-text');
+            list.innerHTML = '';
+            dateText.innerText = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
+
+            const key = formatDate(selectedDate);
+            const dayCompletions = completions[key] || [];
+
+            if (tasks.length === 0) {
+                list.innerHTML = `<div class="text-center py-12 bg-white rounded-3xl border border-dashed border-[#5A5A40]/20"><p class="text-sm text-[#5A5A40]/40">등록된 할일이 없습니다.</p></div>`;
+                return;
+            }
+
+            tasks.forEach(task => {
+                const isDone = dayCompletions.includes(task.id);
+                const div = document.createElement('div');
+                div.onclick = () => toggleComplete(task.id);
+                div.className = `flex items-center gap-4 p-5 rounded-2xl cursor-pointer transition-all border ${isDone ? 'bg-[#5A5A40] text-white border-transparent' : 'bg-white border-[#5A5A40]/5 shadow-sm hover:border-[#5A5A40]/20'}`;
+                
+                div.innerHTML = `
+                    <div class="${isDone ? 'text-white' : 'text-[#5A5A40]/30'}">
+                        ${isDone 
+                            ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>' 
+                            : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'}
+                    </div>
+                    <span class="flex-1 text-lg font-medium ${isDone ? 'opacity-80' : ''}">${task.text}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderManageList() {
+            const list = document.getElementById('manage-list');
+            list.innerHTML = '';
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-4 bg-[#F5F5F0]/50 rounded-xl";
+                div.innerHTML = `
+                    <span class="font-medium">${task.text}</span>
+                    <button onclick="deleteTask('${task.id}')" class="text-red-400 hover:text-red-600">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // 초기 실행
+        render();
     </script>
 </body>
 </html>
