@@ -13,6 +13,17 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(90, 90, 64, 0.2); border-radius: 10px; }
+        
+        /* 100% 완료 시 빛나는 효과 */
+        .complete-glow {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); }
+        }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -24,7 +35,7 @@
             <header class="flex items-center justify-between mb-12">
                 <div>
                     <h1 class="text-4xl font-serif font-light tracking-tight">하루 <span class="italic text-[#5A5A40]">할일</span></h1>
-                    <p class="text-sm text-[#5A5A40]/60 mt-1 uppercase tracking-widest font-medium">월간 진행 현황</p>
+                    <p class="text-sm text-[#5A5A40]/60 mt-1 uppercase tracking-widest font-medium">Daily Management</p>
                 </div>
                 <button onclick="openSettings()" class="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-all text-[#5A5A40]">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -38,8 +49,8 @@
                         <div class="flex items-center justify-between mb-8">
                             <h2 id="calendar-title" class="text-2xl font-serif italic">2024년 3월</h2>
                             <div class="flex gap-2">
-                                <button onclick="prevMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-                                <button onclick="nextMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+                                <button onclick="prevMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+                                <button onclick="nextMonth()" class="p-2 hover:bg-[#F5F5F0] rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
                             </div>
                         </div>
                         <div class="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] uppercase tracking-widest font-bold text-[#5A5A40]/40">
@@ -52,9 +63,14 @@
                 <!-- Daily Tasks Section -->
                 <div class="lg:col-span-5">
                     <div class="sticky top-8">
-                        <div class="mb-8">
-                            <span class="text-[10px] uppercase tracking-[0.2em] text-[#5A5A40]/50 font-bold">선택된 날짜</span>
-                            <h3 id="selected-date-text" class="text-3xl font-serif mt-1">3월 12일</h3>
+                        <div class="mb-8 flex justify-between items-end">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-[#5A5A40]/50 font-bold">선택된 날짜</span>
+                                <h3 id="selected-date-text" class="text-3xl font-serif mt-1">3월 12일</h3>
+                            </div>
+                            <div id="completion-badge" class="hidden">
+                                <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">All Done</span>
+                            </div>
                         </div>
                         <div id="task-list" class="space-y-3"></div>
                     </div>
@@ -72,25 +88,28 @@
                 <button onclick="closeSettings()" class="p-2 hover:bg-[#F5F5F0] rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             <div class="relative mb-8 flex gap-2">
-                <input id="new-task-input" type="text" placeholder="새로운 할일 이름..." class="flex-1 bg-[#F5F5F0] border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-[#5A5A40]/20 outline-none">
-                <button onclick="addTask()" class="p-4 bg-[#5A5A40] text-white rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                <input id="new-task-input" type="text" placeholder="새로운 할일 추가..." class="flex-1 bg-[#F5F5F0] border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-[#5A5A40]/20 outline-none">
+                <button onclick="addTask()" class="p-4 bg-[#5A5A40] text-white rounded-xl hover:bg-[#4A4A30] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
             </div>
             <div id="manage-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar"></div>
-            <button onclick="closeSettings()" class="w-full mt-8 py-4 bg-[#5A5A40] text-white rounded-2xl font-bold uppercase tracking-widest text-xs">완료</button>
+            <button onclick="closeSettings()" class="w-full mt-8 py-4 bg-[#5A5A40] text-white rounded-2xl font-bold uppercase tracking-widest text-xs">저장 및 닫기</button>
         </div>
     </div>
 
     <script>
-        // --- 데이터 상태 ---
-        let tasks = JSON.parse(localStorage.getItem('tasks-v1')) || [{ id: 't1', text: '리뷰 관리 매일매일 하기' }];
-        let completions = JSON.parse(localStorage.getItem('completions-v1')) || {};
+        // --- 데이터 초기화 (요청하신 기본 메뉴 설정) ---
+        let tasks = JSON.parse(localStorage.getItem('tasks-v2')) || [
+            { id: 't1', text: '어제 리뷰 답변하기' },
+            { id: 't2', text: '쿠팡매출/광고비 기록하기' }
+        ];
+        let completions = JSON.parse(localStorage.getItem('completions-v2')) || {};
         let currentMonth = new Date();
         let selectedDate = new Date();
 
-        // --- 초기화 및 저장 ---
+        // --- 데이터 저장 ---
         function save() {
-            localStorage.setItem('tasks-v1', JSON.stringify(tasks));
-            localStorage.setItem('completions-v1', JSON.stringify(completions));
+            localStorage.setItem('tasks-v2', JSON.stringify(tasks));
+            localStorage.setItem('completions-v2', JSON.stringify(completions));
         }
 
         function formatDate(date) {
@@ -111,7 +130,6 @@
             input.value = '';
             save();
             renderManageList();
-            render();
         }
 
         function deleteTask(id) {
@@ -119,7 +137,6 @@
             tasks = tasks.filter(t => t.id !== id);
             save();
             renderManageList();
-            render();
         }
 
         function toggleComplete(taskId) {
@@ -132,7 +149,7 @@
             render();
         }
 
-        // --- 렌더링 함수 ---
+        // --- 렌더링 ---
         function render() {
             renderCalendar();
             renderTaskList();
@@ -150,35 +167,46 @@
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
 
-            // 빈 칸 (이전 달)
+            // 빈 칸
             for (let i = 0; i < firstDay; i++) {
                 grid.innerHTML += `<div class="aspect-square"></div>`;
             }
 
-            // 날짜 채우기
+            // 날짜 생성
             for (let i = 1; i <= lastDate; i++) {
                 const dateObj = new Date(year, month, i);
                 const key = formatDate(dateObj);
                 const doneCount = (completions[key] || []).length;
+                const isAllDone = tasks.length > 0 && doneCount === tasks.length;
                 const rate = tasks.length > 0 ? doneCount / tasks.length : 0;
                 const isSelected = formatDate(selectedDate) === key;
                 const isToday = formatDate(new Date()) === key;
 
                 const btn = document.createElement('button');
                 btn.onclick = () => { selectedDate = new Date(year, month, i); render(); };
-                btn.className = `aspect-square rounded-xl flex flex-col items-center justify-center relative transition-all border-2 ${isSelected ? 'border-[#5A5A40]' : 'border-transparent'}`;
                 
-                if (rate > 0) {
-                    btn.style.backgroundColor = `rgba(90, 90, 64, ${0.1 + rate * 0.8})`;
+                // 기본 스타일
+                let baseClass = `aspect-square rounded-xl flex flex-col items-center justify-center relative transition-all border-2 ${isSelected ? 'border-[#5A5A40]' : 'border-transparent'}`;
+                
+                if (isAllDone) {
+                    // 100% 완료 시: 에메랄드 색상 + 빛나는 효과
+                    btn.className = baseClass + " bg-emerald-500 text-white complete-glow";
+                } else if (rate > 0) {
+                    // 일부 완료 시: 농도 조절
+                    btn.className = baseClass;
+                    btn.style.backgroundColor = `rgba(90, 90, 64, ${0.1 + rate * 0.7})`;
                     btn.style.color = rate > 0.6 ? 'white' : '#1A1A1A';
                 } else {
-                    btn.className += " bg-[#F9F9F7]";
+                    btn.className = baseClass + " bg-[#F9F9F7]";
                 }
 
-                btn.innerHTML = `<span class="text-sm font-medium ${isToday && rate === 0 ? 'text-[#5A5A40] underline underline-offset-4 decoration-2' : ''}">${i}</span>`;
-                if (rate === 1 && tasks.length > 0) {
-                    btn.innerHTML += `<div class="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>`;
+                btn.innerHTML = `<span class="text-sm font-medium ${isToday && !isAllDone ? 'text-[#5A5A40] underline underline-offset-4 decoration-2' : ''}">${i}</span>`;
+                
+                // 100% 완료 시 별 아이콘 추가
+                if (isAllDone) {
+                    btn.innerHTML += `<div class="absolute top-1 right-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-300"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>`;
                 }
+                
                 grid.appendChild(btn);
             }
         }
@@ -186,11 +214,15 @@
         function renderTaskList() {
             const list = document.getElementById('task-list');
             const dateText = document.getElementById('selected-date-text');
+            const badge = document.getElementById('completion-badge');
             list.innerHTML = '';
             dateText.innerText = `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
 
             const key = formatDate(selectedDate);
             const dayCompletions = completions[key] || [];
+            const isAllDone = tasks.length > 0 && dayCompletions.length === tasks.length;
+
+            badge.classList.toggle('hidden', !isAllDone);
 
             if (tasks.length === 0) {
                 list.innerHTML = `<div class="text-center py-12 bg-white rounded-3xl border border-dashed border-[#5A5A40]/20"><p class="text-sm text-[#5A5A40]/40">등록된 할일이 없습니다.</p></div>`;
